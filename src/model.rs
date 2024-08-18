@@ -1,4 +1,5 @@
 use borsh::{BorshDeserialize, BorshSerialize};
+use solana_program::pubkey::Pubkey;
 
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
@@ -10,19 +11,23 @@ pub struct Product {
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Account {
-    pub pub_key: String,
+    pub pub_key: Option<Pubkey>,
     pub name: String,
     pub email:  String,
     pub roles: u8,
+    pub image_url: String,
+    pub products: Vec<Product>,
 }
 
 impl Account {
     pub fn new() -> Account {
         Account {
-            pub_key: String::from(""),
+            pub_key: None,
             name: String::from(""),
             email: String::from(""),
-            roles: 0
+            roles: 0,
+            image_url:"".to_string(),
+            products:vec![]
         }
     }
 

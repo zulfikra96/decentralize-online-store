@@ -24,7 +24,7 @@ const schemaProduct = {
 }
 
 const schemaKeyValue = {
-    struct:{
+    struct: {
         key: "string",
         value: "string"
     }
@@ -34,7 +34,7 @@ const schemaCommand = {
     struct: {
         action: "string",
         key_value: {
-            "array":{
+            "array": {
                 type: schemaKeyValue
             }
         }
@@ -53,17 +53,18 @@ describe("test", async () => {
     const programSecreetKey = Uint8Array.from(JSON.parse(fs.readFileSync(PROGRAM_KEYPAIR_PATH, { encoding: "utf8" })));
     const ownerSecreetKey = Uint8Array.from(JSON.parse(fs.readFileSync(OWNER_KEYPAIR_PATH, { encoding: "utf8" })));
     const globalSecreetKey = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "client.json"), { encoding: "utf8" }))
+    const newAccount = Uint8Array.from(JSON.parse(fs.readFileSync(path.join(__dirname, "..", "new-account.json"), { encoding: "utf8" })))
     const connection = new Connection("http://127.0.0.1:8899", "confirmed");
-        const ownerKeypair = Keypair.fromSecretKey(ownerSecreetKey);
-        const programKeypair = Keypair.fromSecretKey(programSecreetKey);
-        let newGlobalSecreetKey = []
-        for (const key in globalSecreetKey) {
-            newGlobalSecreetKey.push(globalSecreetKey[key]);
-        }
-        const globalKeypair = Keypair.fromSecretKey(Uint8Array.from(newGlobalSecreetKey));
-
+    const ownerKeypair = Keypair.fromSecretKey(ownerSecreetKey);
+    const programKeypair = Keypair.fromSecretKey(programSecreetKey);
+    let newGlobalSecreetKey = []
+    for (const key in globalSecreetKey) {
+        newGlobalSecreetKey.push(globalSecreetKey[key]);
+    }
+    const globalKeypair = Keypair.fromSecretKey(Uint8Array.from(newGlobalSecreetKey));
+    const newAccountKeypair = Keypair.fromSecretKey(Uint8Array.from(newAccount));
     // test("initial global account", async () => {
-        
+
     //     const ownerInfo = await connection.getAccountInfo(ownerKeypair.publicKey);
     //     const serializeData = serialize(schemaCommand, {
     //         action: "initial",
@@ -92,51 +93,54 @@ describe("test", async () => {
     //     )
     // })
 
-    test("register account", async() => {
+    test("register account", async () => {
         const programKeypair = Keypair.fromSecretKey(programSecreetKey);
         const ownerKeypair = Keypair.fromSecretKey(ownerSecreetKey);
-        let newAccount = Keypair.generate()
 
-    
+
         // await connection.confirmTransaction(signature)
-        let accountDetail = await connection.getBalance(newAccount.publicKey);
+        let accountDetail = await connection.getBalance(newAccountKeypair.publicKey);
+        let accountInfo = await connection.getAccountInfo(newAccountKeypair.publicKey);
         const signature = await connection.requestAirdrop(
-            newAccount.publicKey,
-            LAMPORTS_PER_SOL * 2
+            newAccountKeypair.publicKey,
+            LAMPORTS_PER_SOL * 10
         )
         await connection.confirmTransaction(signature);
-        console.log("account detail ", ownerKeypair.publicKey);
+        // console.log("account detail ", accountInfo);
         const serializeData = serialize(schemaCommand, {
-            action: "show-accounts",
-            key_value:[
-                {key:"name", value:"zulfikra lahmudin"},
-                {key:"email", value:"zulfikalahmudin@gmail.com"},
-                {key:"roles", value:"1"}
+            action: "register",
+            key_value: [
+                { key: "name", value: "zulfikra lahmudin" },
+                { key: "email", value: "zulfikalahmudin@gmail.com" },
+                { key: "roles", value: "1" }
             ]
         });
 
         // console.log(accountDetail);
-        
-        console.log("owner program ID ", accountDetail);
-        const transaction = new Transaction().add(
-            new TransactionInstruction({
-                keys: [
-                    // new account
-                    { pubkey:   newAccount.publicKey, isSigner: false, isWritable: false },
-                    // global account
-                    { pubkey: globalKeypair.publicKey, isSigner: false, isWritable: true },
-                    { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-                ],
-                programId: programKeypair.publicKey,
-                data: Buffer.from(serializeData)
-            })
-        );
 
-        await sendAndConfirmTransaction(
-            connection,
-            transaction,
-            [newAccount, globalKeypair]
-        )
+        console.log("owner program ID ", accountInfo);
+        // if (accountInfo === null) {
+            const transaction = new Transaction().add(
+                new TransactionInstruction({
+                    keys: [
+                        // new account
+                        { pubkey: newAccountKeypair.publicKey, isSigner: true, isWritable: true },
+                        // global account
+                        { pubkey: globalKeypair.publicKey, isSigner: false, isWritable: true },
+                        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+                    ],
+                    programId: programKeypair.publicKey,
+                    data: Buffer.from(serializeData)
+                })
+            );
+
+            await sendAndConfirmTransaction(
+                connection,
+                transaction,
+                [newAccountKeypair, globalKeypair]
+            )
+        // }
+
     })
 
     //  test("register account", async() => {
@@ -157,7 +161,7 @@ describe("test", async () => {
     //             {key:"roles", value:"1"}
     //         ]
     //     });
-        
+
     //     // console.log("owner program ID ", );
     //     const transaction = new Transaction().add(
     //         new TransactionInstruction({
@@ -178,5 +182,5 @@ describe("test", async () => {
     //     )
     // })
 
-    
+
 })
