@@ -1,7 +1,7 @@
 {
   "scripts": {
     "test": "ts-mocha -p ./tsconfig.json -t 1000000 tests/*.ts",
-    "deploy": "cargo build-bpf && solana program deploy target/deploy/online_store.so",
+    "deploy": "cargo build-bpf  && solana program deploy target/deploy/online_store.so --verbose",
     "validator": "solana-test-validator -r",
     "initial": "ts-node ./initial_global_account.ts",
     "dev": "cd client && npm run dev"
@@ -14,7 +14,8 @@
     "fs": "^0.0.1-security",
     "http-proxy": "^1.18.1",
     "mz": "^2.7.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",

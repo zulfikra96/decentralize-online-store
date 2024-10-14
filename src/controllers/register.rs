@@ -1,7 +1,7 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::account_info::{next_account_info, AccountInfo};
 use solana_program::entrypoint::ProgramResult;
-use solana_program::msg;
+use solana_program::{borsh1, msg};
 use solana_program::program_error::ProgramError;
 use solana_program::pubkey::Pubkey;
 
@@ -20,13 +20,12 @@ pub fn register(
 
     let mut new_account_data = global_account.try_borrow_mut_data()?;
 
-    let mut storages =
-        solana_program::borsh1::try_from_slice_unchecked::<AccountList>(&new_account_data)?;
+    let mut storages = borsh1::try_from_slice_unchecked::<AccountList>(&new_account_data)?;
     let data = Command::try_from_slice(instruction_data)?;
     let key_value = data.key_value;
     let mut account: Account = Account::new();
     account.pub_key = Some(*payer.key);
-
+    account.products = vec![];
     // Add to global storage
     let _ = key_value
         .into_iter()
@@ -48,13 +47,7 @@ pub fn register(
         .collect::<Vec<KeyValue>>();
 
     storages.accounts.push(account);
-
-    msg!(
-        "size account {:?}",
-        storages.accounts.len() + std::mem::size_of::<AccountList>()
-    );
-    msg!("storages {:?}", storages);
-    msg!("global account {:?}", storages);
+    msg!("Success to register");
     match storages.serialize(&mut *new_account_data) {
         Ok(_) => (),
         Err(err) => {

@@ -4,9 +4,10 @@ use solana_program::pubkey::Pubkey;
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Product {
+    pub id: String,
     pub name: String,
-    pub qt: usize,
-    pub price: u64,
+    pub qt: u64,
+    pub price: f64,
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
@@ -44,11 +45,13 @@ impl Account {
     }
 }
 
+#[repr(C)]
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct AccountList {
     pub accounts: Vec<Account>,
 }
 
+#[repr(C)]
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct ProductList {
     pub products: Vec<Product>,
