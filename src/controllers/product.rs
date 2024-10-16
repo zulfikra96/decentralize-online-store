@@ -38,6 +38,7 @@ pub fn add_product(
         qt: 0,
         price: 0.0
     };
+
     let _ = key_value
         .into_iter()
         .map(|kv| {
@@ -70,5 +71,42 @@ pub fn add_product(
             return Err(ProgramError::InvalidInstructionData);
         }
     };
+    Ok(())
+}
+
+pub fn delete_product(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8]) -> ProgramResult {
+    msg!("delete product");
+
+    let accounts_iter = &mut accounts.iter();
+    let payer = next_account_info(accounts_iter)?;
+    let pda = next_account_info(accounts_iter)?;
+    // let system_program_account = next_account_info(accounts_iter)?;
+    let mut global_pda_data = pda.try_borrow_mut_data()?;
+
+    let instruction = borsh1::try_from_slice_unchecked::<Command>(&instruction_data)?;
+    let mut id: String = String::from("");
+    let key_value = instruction.key_value;
+
+    let mut products = borsh1::try_from_slice_unchecked::<ProductList>(&global_pda_data).map_err(|err| {
+        msg!("Error slice product {:?} {:?}", err, line!());
+        err
+    })?;
+
+    let _ = key_value
+        .into_iter()
+        .map(|kv| {
+            if kv.key == String::from("id") {
+                id = kv.value.clone();
+            }
+            return kv;
+        })
+        .collect::<Vec<KeyValue>>();
+    let mut new_products = products.products.clone();
+    for (index, product) in products.products.iter().enumerate() {
+        if product.id == id {
+            new_products.remove(index);
+        }
+    }
+    new_products.serialize(&mut *global_pda_data)?;
     Ok(())
 }

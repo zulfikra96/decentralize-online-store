@@ -66,7 +66,6 @@ describe("test", async () => {
     }
     const globalKeypair = Keypair.fromSecretKey(Uint8Array.from(newGlobalSecreetKey));
     const newAccountKeypair = Keypair.fromSecretKey(Uint8Array.from(newAccount));
-    console.log("secreet key ", bs58.encode(ownerKeypair.secretKey));
     // test("initial global account", async () => {
 
     //     const ownerInfo = await connection.getAccountInfo(globalKeypair.publicKey);
@@ -178,9 +177,70 @@ describe("test", async () => {
     //         action: "add-product",
     //         key_value: [
     //             {key:'id', value: v4().toString()},
-    //             { key: "name", value: "kayu" },
+    //             { key: "name", value: "NAsi goreng" },
     //             { key: "qt", value: "10" },
     //             { key: "price", value: "10.0" }
+    //         ]
+    //     });
+    //     const programKeypair = Keypair.fromSecretKey(programSecreetKey);
+    //     const ownerKeypair = Keypair.fromSecretKey(ownerSecreetKey);
+    //     const [pda, bum] = await PublicKey.findProgramAddressSync([seed], programKeypair.publicKey);
+    //     const globalAccount = await connection.getAccountInfo(pda);
+    //     const ownerAccount = await connection.getAccountInfo(ownerKeypair.publicKey);
+
+    //     console.log("PDA: ", pda.toBase58())
+    //     console.log("BUM: ", bum)
+    //     console.log("global account : ", ownerAccount)
+    //     // const pdaInfo = await connection.getAccountInfo(pda);
+    //     // const des = deserialize(products, globalAccount.data);
+    //     const transaction = new Transaction().add(
+    //         new TransactionInstruction({
+    //             keys: [
+    //                 // new account
+    //                 { pubkey: ownerKeypair.publicKey, isSigner: true, isWritable: true },
+    //                 // global account
+    //                 { pubkey: pda, isSigner: false, isWritable: true },
+    //                 { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    //             ],
+    //             programId: programKeypair.publicKey,
+    //             data: Buffer.from(serializeData)
+    //         })
+    //     );
+
+    //     await sendAndConfirmTransaction(
+    //         connection,
+    //         transaction,
+    //         [ownerKeypair]
+    //     )
+    // })
+
+    //  test("Delete product", async () => {
+    //     let seed = Buffer.from("global");
+
+    //     const productInterface = {
+    //         struct: {
+    //             id: 'string',
+    //             name: 'string',
+    //             qt: 'u64',
+    //             price: 'f64'
+    //         }
+    //     }
+
+    //     const products = {
+    //         struct: {
+    //             products: {
+    //                 'array': { type: productInterface }
+    //             }
+    //         }
+    //     };
+
+    //     const serializeData = serialize(schemaCommand, {
+    //         action: "delete-product",
+    //         key_value: [
+    //             {key:'id', value: "1abd16ce-742c-4407-85e3-94cc25b99c11"},
+    //             // { key: "name", value: "kayu" },
+    //             // { key: "qt", value: "10" },
+    //             // { key: "price", value: "10.0" }
     //         ]
     //     });
     //     const programKeypair = Keypair.fromSecretKey(programSecreetKey);
